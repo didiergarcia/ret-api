@@ -16,6 +16,16 @@ export enum AccountType {
   CHECKING = "CHECKING"
 };
 
+export const OPTIONAL_REINVEST_DIVIDEND_ACCOUNTS = [
+  AccountType.TRADITIONAL_IRA,
+  AccountType.ROLLOVER_IRA,
+  AccountType.SEP_IRA,
+  AccountType.SIMPLE_IRA,
+  AccountType.ROTH_IRA,
+  AccountType.BROKERAGE,
+  AccountType.HSA
+];
+
 export const CATCHUP_ALLOWED_ACCOUNTS = [
   AccountType.PRETAX_401K,
   AccountType.ROTH_401K,
@@ -200,7 +210,13 @@ export class RetirementCore {
     const now = new Date();
     console.log(`now: ${now}, month: ${now.getMonth()}`)
 
-    // Special-case if year is 0 return the same as current balance of year 0.
+    if (OPTIONAL_REINVEST_DIVIDEND_ACCOUNTS.includes(accountType)) {
+      if (dividendReinvested) {
+        console.log( `Reinvesting dividend`);
+
+        interest += dividend;
+      }
+    }
 
 
     let currentPretax = startingBalance.pretax;

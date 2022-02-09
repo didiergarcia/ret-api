@@ -36,7 +36,6 @@ test('getBucketsForAccountType() returns the correct buckets', () => {
 
 });
 
-
 test('amortizeAccount() PRETAX_401K - return correct data for year 0', () => {
   const rc = new RetirementCore();
 
@@ -55,6 +54,7 @@ test('amortizeAccount() PRETAX_401K - return correct data for year 0', () => {
   let yearlyCatchUp = 0;
   let catchupAge = 55;
   let employerContribute = 0;
+  let reinvestDividend = true;
   let result = rc.amortizeAccount(
     AccountType.PRETAX_401K,
     age,
@@ -63,7 +63,7 @@ test('amortizeAccount() PRETAX_401K - return correct data for year 0', () => {
     startingBalance,
     interestRate,
     dividendYield,
-    true,
+    reinvestDividend,
     yearlyContribution,
     matchLimit,
     matchOfPay,
@@ -90,6 +90,7 @@ test('amortizeAccount() PRETAX_401K - will compound contributions in a pretax 40
   let yearlyCatchUp = 0;
   let employerContribute = 0;
   let catchupAge = 55;
+  let reinvestDividend = true;
 
   let result = rc.amortizeAccount(
     AccountType.PRETAX_401K,
@@ -99,7 +100,7 @@ test('amortizeAccount() PRETAX_401K - will compound contributions in a pretax 40
     startingBalance,
     interestRate,
     dividendYield,
-    true,
+    reinvestDividend,
     yearlyContribution,
     matchLimit,
     matchOfPay,
@@ -135,6 +136,7 @@ test('amortizeAccount() PRETAX_401K - add catch contributions in pretax of 401K'
   let yearlyCatchUp = 3000;
   let employerContribute = 0;
   let catchupAge = 55;
+  let reinvestDividend = true;
 
   let result = rc.amortizeAccount(
     AccountType.PRETAX_401K,
@@ -144,7 +146,7 @@ test('amortizeAccount() PRETAX_401K - add catch contributions in pretax of 401K'
     startingBalance,
     interestRate,
     dividendYield,
-    true,
+    reinvestDividend,
     yearlyContribution,
     matchLimit,
     matchOfPay,
@@ -167,7 +169,7 @@ test('amortizeAccount() PRETAX_401K - add catch contributions in pretax of 401K'
 
 });
 
-test('amortizeAccount() PRETAX_401K - add employeer match in pretax of 401K', () => {
+test('amortizeAccount() PRETAX_401K - add employeer match FULL in pretax of 401K', () => {
   const rc = new RetirementCore();
   let startingBalance = { pretax: 100000, roth: 0, regular: 0 };
   let interestRate = 0.08;
@@ -181,6 +183,7 @@ test('amortizeAccount() PRETAX_401K - add employeer match in pretax of 401K', ()
   let yearlyCatchUp = 0;
   let employerContribute = 0;
   let catchupAge = 55;
+  let reinvestDividend = true;
 
   let result = rc.amortizeAccount(
     AccountType.PRETAX_401K,
@@ -190,7 +193,7 @@ test('amortizeAccount() PRETAX_401K - add employeer match in pretax of 401K', ()
     startingBalance,
     interestRate,
     dividendYield,
-    true,
+    reinvestDividend,
     yearlyContribution,
     matchLimit,
     matchOfPay,
@@ -227,6 +230,7 @@ test('amortizeAccount() PRETAX_401K - add employeer contribution in pretax of 40
   let yearlyCatchUp = 0;
   let employerContribute = 25000;
   let catchupAge = 55;
+  let reinvestDividend = true;
 
   let result = rc.amortizeAccount(
     AccountType.PRETAX_401K,
@@ -236,7 +240,7 @@ test('amortizeAccount() PRETAX_401K - add employeer contribution in pretax of 40
     startingBalance,
     interestRate,
     dividendYield,
-    true,
+    reinvestDividend,
     yearlyContribution,
     matchLimit,
     matchOfPay,
@@ -259,7 +263,7 @@ test('amortizeAccount() PRETAX_401K - add employeer contribution in pretax of 40
 
 });
 
-test('amortizeAccount() PRETAX_401K - add employeer match in pretax of 401K', () => {
+test('amortizeAccount() PRETAX_401K - add employeer match HALF in pretax of 401K', () => {
   const rc = new RetirementCore();
   let startingBalance = { pretax: 100000, roth: 0, regular: 0 };
   let interestRate = 0.08;
@@ -273,6 +277,7 @@ test('amortizeAccount() PRETAX_401K - add employeer match in pretax of 401K', ()
   let yearlyCatchUp = 0;
   let employerContribute = 0;
   let catchupAge = 55;
+  let reinvestDividend = true;
 
   let result = rc.amortizeAccount(
     AccountType.PRETAX_401K,
@@ -282,7 +287,7 @@ test('amortizeAccount() PRETAX_401K - add employeer match in pretax of 401K', ()
     startingBalance,
     interestRate,
     dividendYield,
-    true,
+    reinvestDividend,
     yearlyContribution,
     matchLimit,
     matchOfPay,
@@ -302,5 +307,463 @@ test('amortizeAccount() PRETAX_401K - add employeer match in pretax of 401K', ()
   expect(result[8]).toEqual({ year: 8, buckets: { pretax: 291459.31, roth: 0, regular: 0 } });
   expect(result[9]).toEqual({ year: 9, buckets: { pretax: 324776.05, roth: 0, regular: 0 } });
   expect(result[10]).toEqual({ year: 10, buckets: { pretax: 360758.13, roth: 0, regular: 0 } });
+
+});
+
+/////////////
+
+test('amortizeAccount() TRADITIONAL_IRA - return correct data for year 0', () => {
+  const rc = new RetirementCore();
+
+  expect(rc.amortizeAccount).not.toBeUndefined();
+
+  let startingBalance = { pretax: 10000, roth: 0, regular: 0 };
+
+  let interestRate = 0.1;
+  let dividendYield = 0.01;
+  let age = 30;
+  let salary = 100000;
+  let years = 0;
+  let yearlyContribution = 1000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let catchupAge = 55;
+  let employerContribute = 0;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.TRADITIONAL_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result).toEqual([{ year: years, buckets: startingBalance }]);
+
+});
+
+test('amortizeAccount() TRADITIONAL_IRA - will compound contributions with dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 10000, roth: 0, regular: 0 };
+  let interestRate = 0.10;
+  let dividendYield = 0.01;
+  let age = 20;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 1200;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.TRADITIONAL_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 12300.00, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 14853.00, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 17686.83, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 20832.38, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 24323.94, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 28199.57, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 32501.52, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 37276.69, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 42577.13, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 48460.61, roth: 0, regular: 0 } });
+});
+
+test('amortizeAccount() TRADITIONAL_IRA - will compound contributions with NO dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 10000, roth: 0, regular: 0 };
+  let interestRate = 0.10;
+  let dividendYield = 0.01;
+  let age = 20;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 1200;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = false;
+
+  let result = rc.amortizeAccount(
+    AccountType.TRADITIONAL_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 12200.00, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 14620.00, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 17282.00, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 20210.20, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 23431.22, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 26974.34, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 30871.77, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 35158.95, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 39874.85, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 45062.34, roth: 0, regular: 0 } });
+});
+
+test('amortizeAccount() TRADITIONAL_IRA - add catch contributions with dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 0, regular: 0 };
+  let interestRate = 0.09;
+  let dividendYield = 0.01;
+  let age = 55;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 12000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 3000;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.TRADITIONAL_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 125000, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 152500, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 182750, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 216025, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 252627.5, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 292890.25, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 337179.28, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 385897.21, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 439486.93, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 498435.62, roth: 0, regular: 0 } });
+
+});
+
+test('amortizeAccount() TRADITIONAL_IRA - add catch contributions with NO dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 0, regular: 0 };
+  let interestRate = 0.09;
+  let dividendYield = 0.01;
+  let age = 55;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 12000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 3000;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = false;
+
+  let result = rc.amortizeAccount(
+    AccountType.TRADITIONAL_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 124000, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 150160, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 178674.40, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 209755.10, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 243633.06, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 280560.04, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 320810.44, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 364683.38, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 412504.88, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 464630.32, roth: 0, regular: 0 } });
+
+});
+
+/////////////
+
+test('amortizeAccount() ROLLOVER_IRA - return correct data for year 0', () => {
+  const rc = new RetirementCore();
+
+  expect(rc.amortizeAccount).not.toBeUndefined();
+
+  let startingBalance = { pretax: 10000, roth: 0, regular: 0 };
+
+  let interestRate = 0.1;
+  let dividendYield = 0.01;
+  let age = 30;
+  let salary = 100000;
+  let years = 0;
+  let yearlyContribution = 1000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let catchupAge = 55;
+  let employerContribute = 0;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROLLOVER_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result).toEqual([{ year: years, buckets: startingBalance }]);
+
+});
+
+test('amortizeAccount() ROLLOVER_IRA - will compound contributions with dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 10000, roth: 0, regular: 0 };
+  let interestRate = 0.10;
+  let dividendYield = 0.01;
+  let age = 20;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 1200;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROLLOVER_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 12300.00, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 14853.00, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 17686.83, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 20832.38, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 24323.94, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 28199.57, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 32501.52, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 37276.69, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 42577.13, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 48460.61, roth: 0, regular: 0 } });
+});
+
+test('amortizeAccount() ROLLOVER_IRA - will compound contributions with NO dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 10000, roth: 0, regular: 0 };
+  let interestRate = 0.10;
+  let dividendYield = 0.01;
+  let age = 20;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 1200;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = false;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROLLOVER_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 12200.00, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 14620.00, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 17282.00, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 20210.20, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 23431.22, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 26974.34, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 30871.77, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 35158.95, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 39874.85, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 45062.34, roth: 0, regular: 0 } });
+});
+
+test('amortizeAccount() ROLLOVER_IRA - add catch contributions with dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 0, regular: 0 };
+  let interestRate = 0.09;
+  let dividendYield = 0.01;
+  let age = 55;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 12000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 3000;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROLLOVER_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 125000, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 152500, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 182750, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 216025, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 252627.5, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 292890.25, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 337179.28, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 385897.21, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 439486.93, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 498435.62, roth: 0, regular: 0 } });
+
+});
+
+test('amortizeAccount() ROLLOVER_IRA - add catch contributions with NO dividend reinvested in a Traditional IRA', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 0, regular: 0 };
+  let interestRate = 0.09;
+  let dividendYield = 0.01;
+  let age = 55;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 12000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 3000;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = false;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROLLOVER_IRA,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 124000, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 150160, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 178674.40, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 209755.10, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 243633.06, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 280560.04, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 320810.44, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 364683.38, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 412504.88, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 464630.32, roth: 0, regular: 0 } });
 
 });
