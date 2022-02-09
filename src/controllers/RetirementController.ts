@@ -3,7 +3,7 @@ import { RetirementCore } from "../core/RetirementCore";
 
 
 
-export default class RetirementController {
+export class RetirementController {
 
 
  async test(req: Request, res: Response, next: NextFunction) {
