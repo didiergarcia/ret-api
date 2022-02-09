@@ -65,6 +65,12 @@ export const ROTH_ACCOUNTS = [
   AccountType.HSA,
 ];
 
+export const REGULAR_ACCOUNTS = [
+  AccountType.BROKERAGE,
+  AccountType.CHECKING,
+  AccountType.SAVINGS,
+];
+
 export const PRETAX_ACCOUNTS = [
   AccountType.PRETAX_401K,
   AccountType.TRADITIONAL_IRA,
@@ -212,7 +218,7 @@ export class RetirementCore {
 
     if (OPTIONAL_REINVEST_DIVIDEND_ACCOUNTS.includes(accountType)) {
       if (dividendReinvested) {
-        console.log( `Reinvesting dividend`);
+        console.log(`Reinvesting dividend`);
 
         interest += dividend;
       }
@@ -230,16 +236,27 @@ export class RetirementCore {
       // do for each bucket:
 
       // pretax:
+      let pretaxNextAcc = currentPretax;
+      if (PRETAX_ACCOUNTS.includes(accountType)) {
+        let pretax = currentPretax;
+        let pretaxNext = pretax * (1 + (interest));
+        pretaxNextAcc = pretaxNext + contribution;
+      }
 
-      let pretax = currentPretax;
-      let pretaxNext = pretax * (1 + (interest));
-      let pretaxNextAcc = pretaxNext + contribution;
+      let regularNextAcc = currentRegular;
+      if (REGULAR_ACCOUNTS.includes(accountType)) {
+        regularNextAcc = currentRegular * (1 + (interest));
+        regularNextAcc += contribution;
+      }
+
 
       // catch up
       if (CATCHUP_ALLOWED_ACCOUNTS.includes(accountType) && age >= catchupAge) {
         console.log(`account has catchup`);
 
-        pretaxNextAcc += catchup;
+        if (PRETAX_ACCOUNTS.includes(accountType)) {
+          pretaxNextAcc += catchup;
+        }
       }
 
       // employer match
@@ -250,32 +267,39 @@ export class RetirementCore {
         // Should the account holder get the match Limit or a smaller limit if he/she didn't contribute enough.
         const minLimit = Math.min(contribution / salary, matchLimit);
 
-
+        // employer match is always pretax
         pretaxNextAcc += (salary * minLimit) * matchOfPay;
       }
 
       // employer contribute
       if (EMPLOYER_CONTRIBUTE_ACCOUNTS.includes(accountType) && employerContribute > 0) {
         console.log(`account has employer contributions`);
+        // employer contribution is always pretax
         pretaxNextAcc += employerContribute;
       }
 
       // Round to two digits
-      pretaxNextAcc = Math.round(pretaxNextAcc * 100) / 100;
+      if (PRETAX_ACCOUNTS.includes(accountType)) {
+        pretaxNextAcc = Math.round(pretaxNextAcc * 100) / 100;
+      }
 
+      if (REGULAR_ACCOUNTS.includes(accountType)) {
+        regularNextAcc = Math.round(regularNextAcc * 100) / 100;
+      }
 
       const next: AmortizedBuckets = {
         year: i,
         buckets: {
           pretax: pretaxNextAcc,
           roth: 0,
-          regular: 0
+          regular: regularNextAcc
         }
       };
 
       schedule.push(next);
 
       currentPretax = pretaxNextAcc;
+      currentRegular = regularNextAcc;
 
     }
 
