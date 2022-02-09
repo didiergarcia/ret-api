@@ -104,7 +104,7 @@ export interface AmortizedBuckets {
 
 export class RetirementCore {
 
-  constructor() {}
+  constructor() { }
 
   public test() {
     return 42;
@@ -113,7 +113,7 @@ export class RetirementCore {
   public getBucketsForAccountType(type: AccountType): BucketType[] {
     const buckets: BucketType[] = [];
 
-    switch(type) {
+    switch (type) {
       case AccountType.PRETAX_401K:
       case AccountType.TRADITIONAL_IRA:
       case AccountType.SEP_IRA:
@@ -182,7 +182,7 @@ export class RetirementCore {
     interest: number,
     dividend: number,
     dividendReinvested: boolean,
-    contribution:number,
+    contribution: number,
     matchLimit: number,
     matchOfPay: number,
     employerContribute: number,
@@ -190,79 +190,79 @@ export class RetirementCore {
     catchupAge: number) {
 
 
-      const schedule: AmortizedBuckets[] = [];
+    const schedule: AmortizedBuckets[] = [];
 
-      schedule.push({
-        year: 0,
-        buckets: startingBalance
-      });
+    schedule.push({
+      year: 0,
+      buckets: startingBalance
+    });
 
     const now = new Date();
-      console.log( `now: ${now}, month: ${now.getMonth()}`)
+    console.log(`now: ${now}, month: ${now.getMonth()}`)
 
-      // Special-case if year is 0 return the same as current balance of year 0.
-
-
-      let currentPretax = startingBalance.pretax;
-      let currentRoth = startingBalance.roth;
-      let currentRegular = startingBalance.regular;
-
-      for (let i = 1; i <= years; i++) {
-        // iteratively build each successive year.
-        // starting * (1 + rate/12)^(12*years)
-        // cb.pt * (1 + .1/12) ^ 1
-        // do for each bucket:
-
-        // pretax:
-
-        let pretax = currentPretax;
-        let pretaxNext = pretax * (1 + (interest));
-        let pretaxNextAcc = pretaxNext + contribution;
-
-        // catch up
-        if (CATCHUP_ALLOWED_ACCOUNTS.includes(accountType) && age >= catchupAge) {
-          console.log(`account has catchup`);
-
-          pretaxNextAcc += catchup;
-        }
-
-        // employer match
-        if (EMPLOYER_MATCH_ACCOUNTS.includes(accountType) && matchLimit > 0 && matchOfPay > 0) {
-
-          console.log(`account has employer match`);
-
-          // Should the account holder get the match Limit or a smaller limit if he/she didn't contribute enough.
-          const minLimit = Math.min(contribution/salary, matchLimit);
+    // Special-case if year is 0 return the same as current balance of year 0.
 
 
-          pretaxNextAcc += (salary * minLimit) * matchOfPay;
-        }
+    let currentPretax = startingBalance.pretax;
+    let currentRoth = startingBalance.roth;
+    let currentRegular = startingBalance.regular;
 
-        // employer contribute
-        if (EMPLOYER_CONTRIBUTE_ACCOUNTS.includes(accountType) && employerContribute > 0){
-          console.log( `account has employer contributions`);
-          pretaxNextAcc += employerContribute;
-        }
+    for (let i = 1; i <= years; i++) {
+      // iteratively build each successive year.
+      // starting * (1 + rate/12)^(12*years)
+      // cb.pt * (1 + .1/12) ^ 1
+      // do for each bucket:
 
-        // Round to two digits
-        pretaxNextAcc = Math.round(pretaxNextAcc * 100)/100;
+      // pretax:
 
+      let pretax = currentPretax;
+      let pretaxNext = pretax * (1 + (interest));
+      let pretaxNextAcc = pretaxNext + contribution;
 
-        const next: AmortizedBuckets = {
-          year: i,
-          buckets: {
-            pretax: pretaxNextAcc,
-            roth: 0,
-            regular: 0
-          }
-        };
+      // catch up
+      if (CATCHUP_ALLOWED_ACCOUNTS.includes(accountType) && age >= catchupAge) {
+        console.log(`account has catchup`);
 
-        schedule.push(next);
-
-        currentPretax = pretaxNextAcc;
-
+        pretaxNextAcc += catchup;
       }
 
-      return schedule;
+      // employer match
+      if (EMPLOYER_MATCH_ACCOUNTS.includes(accountType) && matchLimit > 0 && matchOfPay > 0) {
+
+        console.log(`account has employer match`);
+
+        // Should the account holder get the match Limit or a smaller limit if he/she didn't contribute enough.
+        const minLimit = Math.min(contribution / salary, matchLimit);
+
+
+        pretaxNextAcc += (salary * minLimit) * matchOfPay;
+      }
+
+      // employer contribute
+      if (EMPLOYER_CONTRIBUTE_ACCOUNTS.includes(accountType) && employerContribute > 0) {
+        console.log(`account has employer contributions`);
+        pretaxNextAcc += employerContribute;
+      }
+
+      // Round to two digits
+      pretaxNextAcc = Math.round(pretaxNextAcc * 100) / 100;
+
+
+      const next: AmortizedBuckets = {
+        year: i,
+        buckets: {
+          pretax: pretaxNextAcc,
+          roth: 0,
+          regular: 0
+        }
+      };
+
+      schedule.push(next);
+
+      currentPretax = pretaxNextAcc;
+
+    }
+
+    return schedule;
   }
 }
