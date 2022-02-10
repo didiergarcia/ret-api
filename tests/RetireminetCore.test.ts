@@ -310,7 +310,284 @@ test('amortizeAccount() PRETAX_401K - add employeer match HALF in pretax of 401K
 
 });
 
-/////////////
+///////////// ROTH 401K
+
+
+test('amortizeAccount() ROTH_401K - return correct data for year 0', () => {
+  const rc = new RetirementCore();
+
+  expect(rc.amortizeAccount).not.toBeUndefined();
+
+  let startingBalance = { pretax: 5000, roth: 10000, regular: 0 };
+
+  let interestRate = 0.1;
+  let dividendYield = 0.01;
+  let age = 30;
+  let salary = 100000;
+  let years = 0;
+  let yearlyContribution = 1000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let catchupAge = 55;
+  let employerContribute = 0;
+  let reinvestDividend = true;
+  let result = rc.amortizeAccount(
+    AccountType.ROTH_401K,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result).toEqual([{ year: years, buckets: startingBalance }]);
+
+});
+
+test('amortizeAccount() ROTH_401K - will compound contributions in a Roth 401K', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 10000, roth: 10000, regular: 0 };
+  let interestRate = 0.10;
+  let dividendYield = 0.01;
+  let age = 20;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 1200;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROTH_401K,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 11000.00, roth: 12200.00, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 12100.00, roth: 14620.00, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 13310.00, roth: 17282.00, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 14641.00, roth: 20210.20, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 16105.10, roth: 23431.22, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 17715.61, roth: 26974.34, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 19487.17, roth: 30871.77, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 21435.89, roth: 35158.95, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 23579.48, roth: 39874.85, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 25937.43, roth: 45062.34, regular: 0 } });
+});
+
+test('amortizeAccount() ROTH_401K - add catch-up contributions in a Roth 401K', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 100000, regular: 0 };
+  let interestRate = 0.09;
+  let dividendYield = 0.01;
+  let age = 55;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 12000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 3000;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROTH_401K,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 109000, roth: 124000, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 118810, roth: 150160, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 129502.90, roth: 178674.4, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 141158.16, roth: 209755.1, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 153862.39, roth: 243633.06, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 167710.01, roth: 280560.04, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 182803.91, roth: 320810.44, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 199256.26, roth: 364683.38, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 217189.32, roth: 412504.88, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 236736.36, roth: 464630.32, regular: 0 } });
+
+});
+
+test('amortizeAccount() ROTH_401K - add employeer match FULL in a Roth 401K', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 100000, regular: 0 };
+  let interestRate = 0.08;
+  let dividendYield = 0.01;
+  let age = 25;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 5000;
+  let matchLimit = 0.05;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROTH_401K,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 113000, roth: 113000, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 127040, roth: 127040, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 142203.2, roth: 142203.2, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 158579.46, roth: 158579.46, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 176265.82, roth: 176265.82, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 195367.09, roth: 195367.09, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 215996.46, roth: 215996.46, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 238276.18, roth: 238276.18, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 262338.27, roth: 262338.27, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 288325.33, roth: 288325.33, regular: 0 } });
+
+});
+
+test('amortizeAccount() ROTH_401K - add employeer contribution in a Roth 401K', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 100000, regular: 0 };
+  let interestRate = 0.08;
+  let dividendYield = 0.01;
+  let age = 25;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 5000;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 25000;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROTH_401K,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 133000, roth: 113000, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 168640, roth: 127040, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 207131.2, roth: 142203.2, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 248701.7, roth: 158579.46, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 293597.84, roth: 176265.82, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 342085.67, roth: 195367.09, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 394452.52, roth: 215996.46, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 451008.72, roth: 238276.18, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 512089.42, roth: 262338.27, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 578056.57, roth: 288325.33, regular: 0 } });
+
+});
+
+test('amortizeAccount() ROTH_401K - add employeer match HALF in a Roth 401K', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 100000, roth: 100000, regular: 0 };
+  let interestRate = 0.08;
+  let dividendYield = 0.01;
+  let age = 25;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 5000;
+  let matchLimit = 0.10;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 0;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.ROTH_401K,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 113000, roth: 113000, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 127040, roth: 127040, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 142203.2, roth: 142203.2, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 158579.46, roth: 158579.46, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 176265.82, roth: 176265.82, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 195367.09, roth: 195367.09, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 215996.46, roth: 215996.46, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 238276.18, roth: 238276.18, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 262338.27, roth: 262338.27, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 288325.33, roth: 288325.33, regular: 0 } });
+
+});
+
+///////////// TRADITIONAL IRA
 
 test('amortizeAccount() TRADITIONAL_IRA - return correct data for year 0', () => {
   const rc = new RetirementCore();
@@ -539,7 +816,7 @@ test('amortizeAccount() TRADITIONAL_IRA - add catch-up contributions with NO div
 
 });
 
-/////////////
+///////////// ROLLOVER IRA
 
 test('amortizeAccount() ROLLOVER_IRA - return correct data for year 0', () => {
   const rc = new RetirementCore();
@@ -768,7 +1045,7 @@ test('amortizeAccount() ROLLOVER_IRA - add catch-up contributions with NO divide
 
 });
 
-/////////////
+///////////// ROTH IRA
 
 test('amortizeAccount() ROTH_IRA - return correct data for year 0', () => {
   const rc = new RetirementCore();
@@ -997,7 +1274,7 @@ test('amortizeAccount() ROTH_IRA - add catch-up contributions with NO dividend r
 
 });
 
-/////////////
+///////////// BROKERAGE
 
 test('amortizeAccount() BROKERAGE - return correct data for year 0', () => {
   const rc = new RetirementCore();

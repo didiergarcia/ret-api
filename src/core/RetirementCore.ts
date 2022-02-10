@@ -89,21 +89,6 @@ export enum BucketType {
   ROTH = "ROTH"
 }
 
-// export enum Months {
-//   January = 0,
-//   February = 1,
-//   March = 2,
-//   April = 3,
-//   May = 4,
-//   June = 5,
-//   July = 6,
-//   August = 7,
-//   September = 8,
-//   October = 9,
-//   November = 10,
-//   December = 11
-// }
-
 export interface Buckets {
   pretax: number;
   roth: number;
@@ -218,6 +203,8 @@ export class RetirementCore {
     const now = new Date();
     console.log(`now: ${now}, month: ${now.getMonth()}`)
 
+    // TODO we should be able to include this for 401ks too, I think those
+    // funds actually do have a dividend yield
     if (OPTIONAL_REINVEST_DIVIDEND_ACCOUNTS.includes(accountType)) {
       if (dividendReinvested) {
         console.log(`Reinvesting dividend`);
@@ -239,10 +226,20 @@ export class RetirementCore {
 
       // pretax:
       let pretaxNextAcc = currentPretax;
-      if (PRETAX_ACCOUNTS.includes(accountType)) {
+      // We might have to accumulate for the pretax account if the main
+      // account type is ROTH (since employer matches are pretax or the
+      // account holder my have rolled funds in or switched from pretax
+      // to roth at some point)
+      if (PRETAX_ACCOUNTS.includes(accountType) || currentPretax > 0) {
         let pretax = currentPretax;
         let pretaxNext = pretax * (1 + (interest));
-        pretaxNextAcc = pretaxNext + contribution;
+
+        // Only add the contribution if the main account type is pretax
+        if (PRETAX_ACCOUNTS.includes(accountType)) {
+          pretaxNextAcc = pretaxNext + contribution;
+        } else {
+          pretaxNextAcc = pretaxNext;
+        }
       }
 
       let regularNextAcc = currentRegular;
@@ -291,17 +288,9 @@ export class RetirementCore {
       }
 
       // Round to two digits
-      if (PRETAX_ACCOUNTS.includes(accountType)) {
-        pretaxNextAcc = Math.round(pretaxNextAcc * 100) / 100;
-      }
-
-      if (REGULAR_ACCOUNTS.includes(accountType)) {
-        regularNextAcc = Math.round(regularNextAcc * 100) / 100;
-      }
-
-      if (ROTH_ACCOUNTS.includes(accountType)) {
-        rothNextAcc = Math.round(rothNextAcc * 100) / 100;
-      }
+      pretaxNextAcc = Math.round(pretaxNextAcc * 100) / 100;
+      regularNextAcc = Math.round(regularNextAcc * 100) / 100;
+      rothNextAcc = Math.round(rothNextAcc * 100) / 100;
 
       const next: AmortizedBuckets = {
         year: i,
