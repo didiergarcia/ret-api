@@ -23,7 +23,7 @@ export const OPTIONAL_REINVEST_DIVIDEND_ACCOUNTS = [
   AccountType.SIMPLE_IRA,
   AccountType.ROTH_IRA,
   AccountType.BROKERAGE,
-  AccountType.HSA
+  AccountType.HSA,
 ];
 
 export const CATCHUP_ALLOWED_ACCOUNTS = [
@@ -31,6 +31,7 @@ export const CATCHUP_ALLOWED_ACCOUNTS = [
   AccountType.ROTH_401K,
   AccountType.TRADITIONAL_IRA,
   AccountType.ROLLOVER_IRA,
+  AccountType.ROTH_IRA,
   AccountType.SEP_IRA,
   AccountType.SIMPLE_IRA,
   AccountType.PRETAX_403b,
@@ -58,6 +59,7 @@ export const EMPLOYER_CONTRIBUTE_ACCOUNTS = [
 ];
 
 export const ROTH_ACCOUNTS = [
+  AccountType.ROTH_IRA,
   AccountType.ROTH_401K,
   AccountType.ROTH_401K,
   AccountType.ROTH_403b,
@@ -249,6 +251,14 @@ export class RetirementCore {
         regularNextAcc += contribution;
       }
 
+      let rothNextAcc = currentRoth;
+      if (ROTH_ACCOUNTS.includes(accountType)) {
+        rothNextAcc = currentRoth * (1 + (interest));
+        rothNextAcc += contribution;
+      }
+
+
+
 
       // catch up
       if (CATCHUP_ALLOWED_ACCOUNTS.includes(accountType) && age >= catchupAge) {
@@ -256,6 +266,8 @@ export class RetirementCore {
 
         if (PRETAX_ACCOUNTS.includes(accountType)) {
           pretaxNextAcc += catchup;
+        } else if (ROTH_ACCOUNTS.includes(accountType)) {
+          rothNextAcc += catchup;
         }
       }
 
@@ -287,11 +299,15 @@ export class RetirementCore {
         regularNextAcc = Math.round(regularNextAcc * 100) / 100;
       }
 
+      if (ROTH_ACCOUNTS.includes(accountType)) {
+        rothNextAcc = Math.round(rothNextAcc * 100) / 100;
+      }
+
       const next: AmortizedBuckets = {
         year: i,
         buckets: {
           pretax: pretaxNextAcc,
-          roth: 0,
+          roth: rothNextAcc,
           regular: regularNextAcc
         }
       };
@@ -300,6 +316,7 @@ export class RetirementCore {
 
       currentPretax = pretaxNextAcc;
       currentRegular = regularNextAcc;
+      currentRoth = rothNextAcc;
 
     }
 
