@@ -24,6 +24,7 @@ export const OPTIONAL_REINVEST_DIVIDEND_ACCOUNTS = [
   AccountType.ROTH_IRA,
   AccountType.BROKERAGE,
   AccountType.HSA,
+  AccountType.SAVINGS, // Adding, but really, this should be non-optional.
 ];
 
 export const CATCHUP_ALLOWED_ACCOUNTS = [
