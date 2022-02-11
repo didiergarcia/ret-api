@@ -201,15 +201,11 @@ export class RetirementCore {
       buckets: startingBalance
     });
 
-    const now = new Date();
-    console.log(`now: ${now}, month: ${now.getMonth()}`)
 
     // TODO we should be able to include this for 401ks too, I think those
     // funds actually do have a dividend yield
     if (OPTIONAL_REINVEST_DIVIDEND_ACCOUNTS.includes(accountType)) {
       if (dividendReinvested) {
-        console.log(`Reinvesting dividend`);
-
         interest += dividend;
       }
     }
@@ -260,8 +256,6 @@ export class RetirementCore {
 
       // catch up
       if (CATCHUP_ALLOWED_ACCOUNTS.includes(accountType) && age >= catchupAge) {
-        console.log(`account has catchup`);
-
         if (PRETAX_ACCOUNTS.includes(accountType)) {
           pretaxNextAcc += catchup;
         } else if (ROTH_ACCOUNTS.includes(accountType)) {
@@ -272,8 +266,6 @@ export class RetirementCore {
       // employer match
       if (EMPLOYER_MATCH_ACCOUNTS.includes(accountType) && matchLimit > 0 && matchOfPay > 0) {
 
-        console.log(`account has employer match`);
-
         // Should the account holder get the match Limit or a smaller limit if he/she didn't contribute enough.
         const minLimit = Math.min(contribution / salary, matchLimit);
 
@@ -283,7 +275,6 @@ export class RetirementCore {
 
       // employer contribute
       if (EMPLOYER_CONTRIBUTE_ACCOUNTS.includes(accountType) && employerContribute > 0) {
-        console.log(`account has employer contributions`);
         // employer contribution is always pretax
         pretaxNextAcc += employerContribute;
       }

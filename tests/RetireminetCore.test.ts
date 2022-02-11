@@ -122,6 +122,52 @@ test('amortizeAccount() PRETAX_401K - will compound contributions in a pretax 40
   expect(result[10]).toEqual({ year: 10, buckets: { pretax: 45062.34, roth: 0, regular: 0 } });
 });
 
+test('amortizeAccount() PRETAX_401K - starting from ZERO will compound contributions in a pretax 401K', () => {
+  const rc = new RetirementCore();
+  let startingBalance = { pretax: 0, roth: 0, regular: 0 };
+  let interestRate = 0.10;
+  let dividendYield = 0.01;
+  let age = 38;
+  let salary = 100000;
+  let years = 10;
+  let yearlyContribution = 1200;
+  let matchLimit = 0.00;
+  let matchOfPay = 1.00;
+  let yearlyCatchUp = 1000;
+  let employerContribute = 0;
+  let catchupAge = 55;
+  let reinvestDividend = true;
+
+  let result = rc.amortizeAccount(
+    AccountType.PRETAX_401K,
+    age,
+    salary,
+    years,
+    startingBalance,
+    interestRate,
+    dividendYield,
+    reinvestDividend,
+    yearlyContribution,
+    matchLimit,
+    matchOfPay,
+    employerContribute,
+    yearlyCatchUp,
+    catchupAge
+  );
+
+  expect(result[0]).toEqual({ year: 0, buckets: startingBalance });
+  expect(result[1]).toEqual({ year: 1, buckets: { pretax: 1200.00, roth: 0, regular: 0 } });
+  expect(result[2]).toEqual({ year: 2, buckets: { pretax: 2520.00, roth: 0, regular: 0 } });
+  expect(result[3]).toEqual({ year: 3, buckets: { pretax: 3972.00, roth: 0, regular: 0 } });
+  expect(result[4]).toEqual({ year: 4, buckets: { pretax: 5569.20, roth: 0, regular: 0 } });
+  expect(result[5]).toEqual({ year: 5, buckets: { pretax: 7326.12, roth: 0, regular: 0 } });
+  expect(result[6]).toEqual({ year: 6, buckets: { pretax: 9258.73, roth: 0, regular: 0 } });
+  expect(result[7]).toEqual({ year: 7, buckets: { pretax: 11384.6, roth: 0, regular: 0 } });
+  expect(result[8]).toEqual({ year: 8, buckets: { pretax: 13723.06, roth: 0, regular: 0 } });
+  expect(result[9]).toEqual({ year: 9, buckets: { pretax: 16295.37, roth: 0, regular: 0 } });
+  expect(result[10]).toEqual({ year: 10, buckets: { pretax: 19124.91, roth: 0, regular: 0 } });
+});
+
 test('amortizeAccount() PRETAX_401K - add catch-up contributions in pretax of 401K', () => {
   const rc = new RetirementCore();
   let startingBalance = { pretax: 100000, roth: 0, regular: 0 };
